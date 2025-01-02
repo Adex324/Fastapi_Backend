@@ -6,6 +6,9 @@ from .routers import post, user, auth,vote
 from .config import settings
 import os
 import uvicorn 
+import subprocess
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))  # Default to 8000 if PORT is not set
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
@@ -15,6 +18,9 @@ if __name__ == "__main__":
 
 app = FastAPI()
 
+@app.on_event("startup")
+async def run_migrations():
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
 origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
